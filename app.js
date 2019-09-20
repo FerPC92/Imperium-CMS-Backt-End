@@ -6,12 +6,22 @@ const jwt = require('jsonwebtoken');
 const expressJWT = require('express-jwt');
 const cors = require('cors');
 const fs = require('fs')
-const colors = require('colors')
+const colors = require('colors');
+
+//para subir archivos del front en la todo
+const  multipart  =  require('connect-multiparty');
+
 
 const server = express();
 
 server.use(bodyParser.json());
 server.use(cors())
+//para subir archivos del front en la todo
+const  multipartMiddleware  =  multipart({ uploadDir:  './uploads' });
+server.use(bodyParser.urlencoded({
+    extended: true
+}));
+
 
 let CategoryCourse = require('./models/categoriesCourses');
 let Place = require('./models/places');
@@ -628,6 +638,27 @@ mongoose.connect('mongodb://localhost/valirium', {
 
         })
     })
+
+
+    //para subir archivos del front en la todo
+    server.get('/api/upload', (req, res) => {
+        res.json({
+            'message': 'hello'
+        });
+    });
+
+    server.post('/api/upload', multipartMiddleware, (req, res) => {
+        //console.log(req.body, req.files);
+        let file = req.files.uploads[0];
+        console.log(file)
+        console.log("The file was saved!");
+
+        res.json({
+            'message': 'File uploaded successfully',
+            'path': file,
+
+        });
+    });
 
 
 
